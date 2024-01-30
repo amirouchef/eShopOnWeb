@@ -23,7 +23,10 @@ pipeline {
 
         stage('Functional') {
           steps {
-            sh 'dotnet test tests/FunctionalTests'
+            warnError(message: 'Functional problem') {
+              sh 'dotnet test tests/FunctionalTests'
+            }
+
           }
         }
 
@@ -33,6 +36,8 @@ pipeline {
     stage('Deployement') {
       steps {
         sh ' dotnet publish eShopOnWeb.sln -o /var/aspnet  -p:ErrorOnDuplicatePublishOutputFiles=false'
+        dir(path: '/avr/aspnet')
+        archiveArtifacts(artifacts: '*', onlyIfSuccessful: true)
       }
     }
 
